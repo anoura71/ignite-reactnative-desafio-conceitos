@@ -9,6 +9,7 @@ interface TodoInputProps {
 export function TodoInput({ addTask }: TodoInputProps) {
   const [task, setTask] = useState('');
 
+  /** Control the titke for the new task. */
   function handleAddNewTask() {
     if (task.length > 0) {
       addTask(task);

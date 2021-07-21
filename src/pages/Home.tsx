@@ -1,14 +1,26 @@
-import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useState } from "react";
+import { Alert, StyleSheet, View } from "react-native";
 
-import { Header } from '../components/Header';
-import { Task, TasksList } from '../components/TasksList';
-import { TodoInput } from '../components/TodoInput';
+import { Header } from "../components/Header";
+import { Task, TasksList } from "../components/TasksList";
+import { TodoInput } from "../components/TodoInput";
 
 export function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
+  /** Add a new task to the list. */
   function handleAddTask(newTaskTitle: string) {
+    // Check if the task title is already used
+    const taskTitleExists = tasks.find((task) => task.title === newTaskTitle);
+    if (taskTitleExists) {
+      Alert.alert(
+        "Task já cadastrada",
+        "Você não pode cadastrar uma task com o mesmo nome"
+      );
+      return;
+    }
+
+    // Create new task
     const newTask = {
       id: new Date().getTime(),
       title: newTaskTitle,
@@ -17,6 +29,7 @@ export function Home() {
     setTasks((oldTasks) => [...oldTasks, newTask]);
   }
 
+  /** Mark/unmark a task as done/not done. */
   function handleToggleTaskDone(id: number) {
     setTasks((oldTasks) =>
       oldTasks.map((task) =>
@@ -25,8 +38,32 @@ export function Home() {
     );
   }
 
+  /** Remove a task from the list */
   function handleRemoveTask(id: number) {
-    setTasks((oldTasks) => oldTasks.filter((item) => item.id !== id));
+    Alert.alert(
+      "Remover item",
+      "Tem certeza que você deseja remover esse item?",
+      [
+        {
+          text: "Sim",
+          onPress: () => {
+            setTasks((oldTasks) => oldTasks.filter((item) => item.id !== id));
+          },
+        },
+        {
+          text: "Não",
+        },
+      ]
+    );
+  }
+
+  /** Edit an existing task. */
+  function handleEditTask(taskId: number, taskNewTitle: string) {
+    setTasks((oldTasks) =>
+      oldTasks.map((task) =>
+        task.id === taskId ? { ...task, title: taskNewTitle } : task
+      )
+    );
   }
 
   return (
@@ -38,6 +75,7 @@ export function Home() {
       <TasksList
         tasks={tasks}
         toggleTaskDone={handleToggleTaskDone}
+        editTask={handleEditTask}
         removeTask={handleRemoveTask}
       />
     </View>
@@ -47,6 +85,6 @@ export function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EBEBEB',
+    backgroundColor: "#EBEBEB",
   },
 });
